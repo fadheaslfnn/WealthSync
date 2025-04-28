@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registrasi Akun - WealthSync</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #d0f0e0, #f0fff5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .container {
+      display: flex;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      max-width: 950px;
+      width: 95%;
+      animation: slideFade 0.7s ease-in-out;
+    }
+
+    .left-panel {
+      background: #eafaf1;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    .left-panel img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .right-panel {
+      flex: 1;
+      padding: 40px 30px;
+    }
+
+    .right-panel h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-size: 28px;
+      font-weight: bold;
+      color: #2e7d32;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: 0.3s ease;
+    }
+
+    .form-group input:focus {
+      border-color: #4CAF50;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+    }
+
+    .btn-register {
+      width: 100%;
+      padding: 14px;
+      background-color: #4CAF50;
+      color: white;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s;
+    }
+
+    .btn-register:hover {
+      background-color: #388e3c;
+      transform: scale(1.02);
+    }
+
+    .warning {
+      background: #ffe1e1;
+      color: #b30000;
+      font-weight: bold;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+
+      .left-panel {
+        display: none;
+      }
+
+      .right-panel {
+        padding: 30px 20px;
+      }
+    }
+
+    @keyframes slideFade {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="left-panel">
+      <img src="c:\Users\akuni\Downloads\Logo_Keuangan_Perbankan_Elegan_Biru_Tua_dan_Emas-removebg-preview.png" alt="Ilustrasi Registrasi" />
+    </div>
+    <div class="right-panel">
+      <h2>Buat Akun Baru</h2>
+      <form action="proses_registrasi.php" method="POST">
+        <!-- <div class="warning">Email sudah terdaftar!</div> -->
+
+        <div class="form-group">
+          <label for="fullname">Nama Lengkap</label>
+          <input type="text" id="fullname" name="fullname" required />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Alamat Email</label>
+          <input type="email" id="email" name="email" required />
+        </div>
+
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" required />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Kata Sandi</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+
+        <button type="submit" class="btn-register">Daftar</button>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    // Import Firebase modules
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { 
+      getAuth, 
+      createUserWithEmailAndPassword,
+      updateProfile
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { 
+      getDatabase, 
+      ref, 
+      set 
+    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+  
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDx27o0bbjyzvXi2JmrabmMj4FMEQmatno",
+      authDomain: "wealthsync-d8cda.firebaseapp.com",
+      projectId: "wealthsync-d8cda",
+      storageBucket: "wealthsync-d8cda.firebasestorage.app",
+      messagingSenderId: "431567262192",
+      appId: "1:431567262192:web:93174cc8360cc974000d35",
+      measurementId: "G-0HYTM7BGB1",
+      databaseURL: "https://wealthsync-d8cda-default-rtdb.firebaseio.com/"
+    };
+  
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const database = getDatabase(app);
+  
+    // Get form elements
+    const registrationForm = document.querySelector('form');
+    const fullnameInput = document.getElementById('fullname');
+    const emailInput = document.getElementById('email');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+  
+    // Handle form submission
+    registrationForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const fullname = fullnameInput.value.trim();
+      const email = emailInput.value.trim();
+      const username = usernameInput.value.trim();
+      const password = passwordInput.value;
+  
+      // Validate inputs
+      if (!fullname || !email || !username || !password) {
+        showWarning('Semua field harus diisi!');
+        return;
+      }
+  
+      if (password.length < 6) {
+        showWarning('Password harus minimal 6 karakter!');
+        return;
+      }
+  
+      // Register user with Firebase Auth
+      createUserWithEmailAndPassword(auth, email, password)
+        .then((userCredential) => {
+          // Update user profile with display name
+          return updateProfile(userCredential.user, {
+            displayName: fullname
+          }).then(() => {
+            return userCredential;
+          });
+        })
+        .then((userCredential) => {
+          // Save additional user data to Realtime Database
+          const user = userCredential.user;
+          const userData = {
+            fullname: fullname,
+            email: email,
+            username: username,
+            createdAt: new Date().toISOString()
+          };
+  
+          return set(ref(database, 'users/' + user.uid), userData);
+        })
+        .then(() => {
+          // Registration successful
+          alert('Registrasi berhasil! Anda akan diarahkan ke halaman login.');
+          window.location.href = 'login.html'; // Ganti dengan halaman login Anda
+        })
+        .catch((error) => {
+          // Handle errors
+          let errorMessage = 'Terjadi kesalahan saat registrasi.';
+          
+          switch (error.code) {
+            case 'auth/email-already-in-use':
+              errorMessage = 'Email sudah terdaftar!';
+              break;
+            case 'auth/invalid-email':
+              errorMessage = 'Email tidak valid!';
+              break;
+            case 'auth/weak-password':
+              errorMessage = 'Password terlalu lemah!';
+              break;
+            default:
+              console.error('Error:', error);
+          }
+          
+          showWarning(errorMessage);
+        });
+    });
+  
+    // Function to show warning message
+    function showWarning(message) {
+      // Remove existing warning if any
+      const existingWarning = document.querySelector('.warning');
+      if (existingWarning) {
+        existingWarning.remove();
+      }
+  
+      // Create warning element
+      const warningDiv = document.createElement('div');
+      warningDiv.className = 'warning';
+      warningDiv.textContent = message;
+  
+      // Insert warning after the h2 title
+      const h2 = document.querySelector('h2');
+      h2.insertAdjacentElement('afterend', warningDiv);
+    }
+  </script>
+</body>
+</html>

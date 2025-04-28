@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard WealthSync</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://kit.fontawesome.com/a2e0e6a1f4.js" crossorigin="anonymous"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    /* Animasi Background */
+    .bg-animation {
+      position: fixed;
+      z-index: -1;
+      opacity: 0.8;
+    }
+
+    .coin-animation {
+      width: 40px;
+      height: 40px;
+      background: radial-gradient(circle at 30% 30%, #FFD700, #D4AF37);
+      border-radius: 50%;
+      box-shadow: 0 0 15px #FFD700;
+      animation: floatCoin 15s infinite linear;
+    }
+
+    .bill-animation {
+      width: 60px;
+      height: 30px;
+      background: #4CAF50;
+      border-radius: 4px;
+      transform: rotate(15deg);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      animation: floatBill 18s infinite linear;
+    }
+
+    .graph-animation {
+      width: 50px;
+      height: 30px;
+      background: repeating-linear-gradient(45deg,
+          #2e7d32,
+          #2e7d32 2px,
+          #4CAF50 2px,
+          #4CAF50 4px);
+      transform: rotate(-10deg);
+      animation: floatGraph 20s infinite linear;
+    }
+
+    @keyframes floatCoin {
+      0% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 0.8;
+      }
+
+      90% {
+        opacity: 0.8;
+      }
+
+      100% {
+        transform: translate(100vw, -100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes floatBill {
+      0% {
+        transform: translate(-100px, 100vh) rotate(15deg);
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 0.8;
+      }
+
+      90% {
+        opacity: 0.8;
+      }
+
+      100% {
+        transform: translate(120vw, -100px) rotate(375deg);
+        opacity: 0;
+      }
+    }
+
+    @keyframes floatGraph {
+      0% {
+        transform: translate(100vw, 50vh) rotate(-10deg);
+        opacity: 0;
+      }
+
+      10% {
+        opacity: 0.8;
+      }
+
+      90% {
+        opacity: 0.8;
+      }
+
+      100% {
+        transform: translate(-100px, -100px) rotate(350deg);
+        opacity: 0;
+      }
+    }
+
+    /* Header */
+    header {
+      background-color: #2e7d32;
+      color: white;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 1rem;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      gap: 1rem;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      transition: background-color 0.3s;
+      border-radius: 0.5rem;
+    }
+
+    .nav-links a:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-links a i {
+      margin-right: 0.5rem;
+    }
+
+    .profile-container {
+      position: relative;
+    }
+
+    #profileButton {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: white;
+      padding: 0.5rem;
+    }
+
+    #profileImage {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    /* Warna Transaksi */
+    .income {
+      color: #2e7d32;
+    }
+
+    .expense {
+      color: #e53935;
+    }
+
+    /* Kartu */
+    .card {
+      background-color: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+    }
+
+    /* Background Utama */
+    body {
+      background-color: #f5f5f5;
+      overflow-x: hidden;
+    }
+
+    /* Grafik Kecil */
+    .chart-container {
+      height: 200px;
+      position: relative;
+    }
+
+    /* Responsif */
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+
+      .header-content {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .logo {
+        margin-right: auto;
+      }
+
+      .grid-cols-1.lg\:grid-cols-3 {
+        grid-template-columns: 1fr;
+      }
+
+      .col-span-2 {
+        grid-column: span 1;
+      }
+    }
+  </style>
+</head>
+
+<body class="font-sans">
+  <!-- Elemen Animasi Background -->
+  <div id="animationContainer"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="header-content">
+      <div class="logo">💰 WealthSync</div>
+
+      <ul class="nav-links">
+        <li><a href="dashboard.html"><i class="fas fa-home"></i> Dashboard</a></li>
+        <li><a href="tambah transaksi.html"><i class="fas fa-plus"></i> Tambah Transaksi</a></li>
+        <li><a href="riwayat transaksi.html"><i class="fas fa-history"></i> Riwayat & Laporan</a></li>
+        <li><a href="pengaturan akun.html"><i class="fas fa-cog"></i> Pengaturan</a></li>
+      </ul>
+
+      <div class="profile-container">
+        <button id="profileButton">
+          <img id="profileImage" src="https://ui-avatars.com/api/?name=User&background=4CAF50&color=fff" alt="Profil">
+          <span id="profileName">Pengguna</span>
+        </button>
+        <div id="profileDropdown" class="hidden absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
+          <a href="pengaturan akun.html" class="block px-4 py-2 text-gray-800 hover:bg-gray-100"><i
+              class="fas fa-user mr-2"></i> Profil Saya</a>
+          <a href="pengaturan akun.html" class="block px-4 py-2 text-gray-800 hover:bg-gray-100"><i
+              class="fas fa-cog mr-2"></i> Pengaturan</a>
+          <a href="#" id="logoutButton" class="block px-4 py-2 text-gray-800 hover:bg-gray-100"><i
+              class="fas fa-sign-out-alt mr-2"></i> Keluar</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Layout Utama -->
+  <div class="flex min-h-screen">
+    <!-- Konten Utama -->
+    <main class="flex-1 p-4 space-y-4">
+      <!-- Grid Konten -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="card p-4 col-span-2">
+          <h2 class="text-lg font-semibold mb-2">Ringkasan <span class="text-green-700">Keuangan</span></h2>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <p class="text-gray-600 mb-1">Total Pemasukan Bulan Ini</p>
+              <p id="monthlyIncome" class="text-xl font-bold income">Rp 0</p>
+            </div>
+            <div>
+              <p class="text-gray-600 mb-1">Total Pengeluaran Bulan Ini</p>
+              <p id="monthlyExpense" class="text-xl font-bold expense">Rp 0</p>
+            </div>
+            <div>
+              <p class="text-gray-600 mb-1">Saldo Bulan Ini</p>
+              <p id="monthlyBalance" class="text-xl font-bold">Rp 0</p>
+            </div>
+            <div>
+              <p class="text-gray-600 mb-1">Total Tabungan</p>
+              <p id="totalSavings" class="text-xl font-bold">Rp 0</p>
+            </div>
+          </div>
+        </div>
+        <div class="card p-4">
+          <div class="flex justify-between items-center mb-2">
+            <h2 class="font-semibold">Saldo Anda</h2>
+            <a href="riwayat transaksi.html" class="text-green-700 text-sm">Detail</a>
+          </div>
+          <p id="currentBalance" class="text-xl font-bold">Rp 0</p>
+          <div class="mt-4">
+            <a href="tambah transaksi.html"
+              class="btn-primary text-white px-4 py-2 rounded w-full block text-center bg-green-700 hover:bg-green-800">Tambah
+              Transaksi</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grafik + Transaksi Terakhir -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="card p-4 col-span-2">
+          <h3 class="font-semibold mb-2">Grafik Keuangan Bulan Ini</h3>
+          <div class="flex justify-between mb-2">
+            <div class="flex space-x-2">
+              <button id="prevMonthBtn" class="px-2 py-1 bg-gray-200 rounded-md">
+                <i class="fas fa-chevron-left"></i>
+              </button>
+              <h4 id="currentMonthYear" class="font-medium"></h4>
+              <button id="nextMonthBtn" class="px-2 py-1 bg-gray-200 rounded-md">
+                <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="financeChart"></canvas>
+          </div>
+        </div>
+        <div class="card p-4">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="font-semibold">Transaksi Terakhir</h3>
+            <a href="riwayat-transaksi.html" class="text-green-700 text-sm">Lihat Semua</a>
+          </div>
+          <div id="recentTransactions" class="space-y-2">
+            <div class="text-center text-gray-500 py-2">Memuat transaksi...</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
+  <script>
+    // Konfigurasi Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDx27o0bbjyzvXi2JmrabmMj4FMEQmatno",
+      authDomain: "wealthsync-d8cda.firebaseapp.com",
+      databaseURL: "https://wealthsync-d8cda-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "wealthsync-d8cda",
+      storageBucket: "wealthsync-d8cda.firebasestorage.app",
+      messagingSenderId: "431567262192",
+      appId: "1:431567262192:web:93174cc8360cc974000d35"
+    };
+
+    // Inisialisasi Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // Referensi Firebase
+    const auth = firebase.auth();
+    const database = firebase.database();
+
+    // Data pengguna global
+    let userData = {
+      profile: {
+        name: "Pengguna",
+        image: "https://ui-avatars.com/api/?name=User&background=4CAF50&color=fff"
+      },
+      balance: 0,
+      monthlyIncome: 0,
+      monthlyExpense: 0,
+      monthlyBalance: 0,
+      totalSavings: 0,
+      transactions: []
+    };
+
+    // Variabel untuk grafik
+    let financeChart = null;
+    let currentChartDate = new Date();
+
+    // Observer status autentikasi
+    auth.onAuthStateChanged((user) => {
+      const currentPage = window.location.pathname.split('/').pop();
+
+      if (user) {
+        // Pengguna masuk
+        document.getElementById('profileName').textContent = user.displayName || "Pengguna";
+
+        // Jika di halaman login, redirect ke dashboard
+        if (currentPage === 'login.html') {
+          window.location.href = 'dashboard.html';
+          return;
+        }
+
+        // Muat data pengguna
+        muatDataPengguna(user.uid);
+      } else {
+        // Redirect ke halaman login jika tidak di halaman login
+        if (currentPage !== 'login.html') {
+          window.location.href = 'login.html';
+        }
+      }
+    });
+
+    // Fungsi untuk memuat data pengguna
+    function muatDataPengguna(userId) {
+      // Dapatkan data profil pengguna
+      const userRef = database.ref('users/' + userId);
+      userRef.once('value').then((snapshot) => {
+        const firebaseData = snapshot.val();
+
+        if (firebaseData) {
+          userData = {
+            profile: {
+              name: firebaseData.profile?.name || "Pengguna",
+              image: firebaseData.profile?.image || `https://ui-avatars.com/api/?name=${firebaseData.profile?.name || 'User'}&background=4CAF50&color=fff`
+            },
+            balance: firebaseData.balance || 0,
+            monthlyIncome: firebaseData.monthlyIncome || 0,
+            monthlyExpense: firebaseData.monthlyExpense || 0,
+            monthlyBalance: firebaseData.monthlyBalance || 0,
+            totalSavings: firebaseData.totalSavings || 0,
+            transactions: []
+          };
+
+          // Muat transaksi
+          muatTransaksi(userId);
+        }
+      });
+    }
+
+    // Fungsi untuk memuat transaksi
+    function muatTransaksi(userId) {
+      const transactionsRef = database.ref('transactions/' + userId);
+      transactionsRef.once('value').then((snapshot) => {
+        const transactionsData = snapshot.val();
+
+        if (transactionsData) {
+          userData.transactions = Object.keys(transactionsData).map(key => ({
+            id: key,
+            ...transactionsData[key]
+          }));
+
+          userData.transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+          hitungTotalKeuangan();
+          perbaruiDashboard();
+        }
+      });
+    }
+
+    // Fungsi untuk menghitung total keuangan
+    function hitungTotalKeuangan() {
+      const sekarang = new Date();
+      const bulanIni = sekarang.getMonth();
+      const tahunIni = sekarang.getFullYear();
+
+      userData.monthlyIncome = 0;
+      userData.monthlyExpense = 0;
+      userData.balance = 0;
+      userData.totalSavings = 0;
+
+      userData.transactions.forEach(transaksi => {
+        const tanggalTrans = new Date(transaksi.date);
+
+        // Hitung saldo total
+        if (transaksi.type === 'income') {
+          userData.balance += Number(transaksi.amount);
+        } else {
+          userData.balance -= Number(transaksi.amount);
+        }
+
+        // Hitung pemasukan dan pengeluaran bulan ini
+        if (tanggalTrans.getMonth() === bulanIni && tanggalTrans.getFullYear() === tahunIni) {
+          if (transaksi.type === 'income') {
+            userData.monthlyIncome += Number(transaksi.amount);
+          } else {
+            userData.monthlyExpense += Number(transaksi.amount);
+          }
+        }
+
+        // Hitung total tabungan (termasuk dari semua waktu)
+        if (transaksi.type === 'savings' || transaksi.isSavings) {
+          if (transaksi.amount) {
+            userData.totalSavings += Number(transaksi.amount);
+          }
+        }
+      });
+
+      userData.monthlyBalance = userData.monthlyIncome - userData.monthlyExpense;
+    }
+
+    // Fungsi utama untuk memperbarui dashboard
+    function perbaruiDashboard() {
+      // Format angka ke Rupiah
+      const formatRupiah = (jumlah) => {
+        return 'Rp ' + Number(jumlah).toLocaleString('id-ID');
+      };
+
+      // Update tampilan
+      document.getElementById('currentBalance').textContent = formatRupiah(userData.balance);
+      document.getElementById('monthlyIncome').textContent = formatRupiah(userData.monthlyIncome);
+      document.getElementById('monthlyExpense').textContent = formatRupiah(userData.monthlyExpense);
+      document.getElementById('monthlyBalance').textContent = formatRupiah(userData.monthlyBalance);
+      document.getElementById('totalSavings').textContent = formatRupiah(userData.totalSavings);
+
+      // Update transaksi terakhir
+      perbaruiTransaksiTerakhir();
+
+      // Inisialisasi grafik
+      inisialisasiGrafik();
+
+      // Update tampilan bulan dan tahun
+      perbaruiTampilanBulanTahun();
+    }
+
+    // Fungsi untuk memperbarui transaksi terakhir
+    function perbaruiTransaksiTerakhir() {
+      const container = document.getElementById('recentTransactions');
+      container.innerHTML = '';
+
+      const transaksiTerakhir = userData.transactions.slice(0, 5);
+
+      if (transaksiTerakhir.length === 0) {
+        container.innerHTML = '<div class="text-center text-gray-500 py-2">Tidak ada transaksi</div>';
+        return;
+      }
+
+      transaksiTerakhir.forEach(transaksi => {
+        const elemen = document.createElement('div');
+        elemen.className = 'flex justify-between items-center p-2 border-b hover:bg-gray-50 cursor-pointer';
+
+        elemen.addEventListener('click', () => {
+          window.location.href = `detail-transaksi.html?id=${transaksi.id}`;
+        });
+
+        const info = document.createElement('div');
+        const catatan = transaksi.notes || transaksi.note || '-';
+        info.innerHTML = `
+          <div class="font-medium text-sm">${catatan}</div>
+          <div class="text-xs text-gray-500">${formatTanggal(transaksi.date)} • ${transaksi.category}</div>
+        `;
+
+        const jumlah = document.createElement('div');
+        jumlah.className = transaksi.type === 'income' ? 'income font-semibold text-sm' : 'expense font-semibold text-sm';
+        jumlah.textContent = `${transaksi.type === 'income' ? '+' : '-'} Rp ${Number(transaksi.amount).toLocaleString('id-ID')}`;
+
+        elemen.appendChild(info);
+        elemen.appendChild(jumlah);
+        container.appendChild(elemen);
+      });
+    }
+
+    // Fungsi untuk memformat tanggal
+    function formatTanggal(tanggalString) {
+      const options = { day: 'numeric', month: 'short' };
+      return new Date(tanggalString).toLocaleDateString('id-ID', options);
+    }
+
+    // Fungsi untuk inisialisasi grafik
+    function inisialisasiGrafik() {
+      const ctx = document.getElementById('financeChart').getContext('2d');
+
+      if (financeChart) {
+        financeChart.destroy();
+      }
+
+      const dataGrafik = siapkanDataGrafik(currentChartDate);
+      financeChart = buatGrafik(ctx, dataGrafik);
+    }
+
+    // Fungsi untuk menyiapkan data grafik
+    function siapkanDataGrafik(tanggal) {
+      const bulan = tanggal.getMonth();
+      const tahun = tanggal.getFullYear();
+
+      const transaksiBulanIni = userData.transactions.filter(transaksi => {
+        const tanggalTrans = new Date(transaksi.date);
+        return tanggalTrans.getMonth() === bulan &&
+          tanggalTrans.getFullYear() === tahun;
+      });
+
+      const hariDalamBulan = new Date(tahun, bulan + 1, 0).getDate();
+      const labels = Array.from({ length: hariDalamBulan }, (_, i) => i + 1);
+
+      const pemasukan = Array(hariDalamBulan).fill(0);
+      const pengeluaran = Array(hariDalamBulan).fill(0);
+      const tabungan = Array(hariDalamBulan).fill(0);
+
+      transaksiBulanIni.forEach(transaksi => {
+        const hari = new Date(transaksi.date).getDate() - 1;
+        const jumlah = Number(transaksi.amount) / 1000000; // Dalam jutaan
+
+        if (transaksi.type === 'income') {
+          pemasukan[hari] += jumlah;
+          if (transaksi.type === 'savings' || transaksi.isSavings) {
+            tabungan[hari] += jumlah;
+          }
+        } else if (transaksi.type === 'expense') {
+          pengeluaran[hari] += jumlah;
+          if (transaksi.type === 'savings' || transaksi.isSavings) {
+            tabungan[hari] -= jumlah;
+          }
+        } else if (transaksi.type === 'savings') {
+          // Untuk transaksi tabungan langsung
+          tabungan[hari] += jumlah;
+        }
+      });
+
+      return { labels, pemasukan, pengeluaran, tabungan };
+    }
+
+    // Fungsi untuk membuat grafik
+    function buatGrafik(ctx, data) {
+      return new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.labels,
+          datasets: [
+            {
+              label: 'Pemasukan',
+              data: data.pemasukan,
+              borderColor: '#2e7d32',
+              backgroundColor: 'rgba(46, 125, 50, 0.1)',
+              tension: 0.3,
+              borderWidth: 2
+            },
+            {
+              label: 'Pengeluaran',
+              data: data.pengeluaran,
+              borderColor: '#e53935',
+              backgroundColor: 'rgba(229, 57, 53, 0.1)',
+              tension: 0.3,
+              borderWidth: 2
+            },
+            {
+              label: 'Tabungan',
+              data: data.tabungan,
+              borderColor: '#1e88e5',
+              backgroundColor: 'rgba(30, 136, 229, 0.1)',
+              tension: 0.3,
+              borderWidth: 2
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+              labels: {
+                boxWidth: 12,
+                padding: 10
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  return context.dataset.label + ': Rp ' +
+                    (context.raw * 1000000).toLocaleString('id-ID');
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function (value) {
+                  return 'Rp ' + (value * 1) + ' jt';
+                }
+              }
+            },
+            x: {
+              grid: {
+                display: false
+              }
+            }
+          },
+          elements: {
+            point: {
+              radius: 3,
+              hoverRadius: 5
+            }
+          }
+        }
+      });
+    }
+
+    // Fungsi untuk memperbarui tampilan bulan dan tahun
+    function perbaruiTampilanBulanTahun() {
+      const options = { month: 'long', year: 'numeric' };
+      document.getElementById('currentMonthYear').textContent =
+        currentChartDate.toLocaleDateString('id-ID', options);
+    }
+
+    // Event listener untuk navigasi bulan
+    document.getElementById('prevMonthBtn').addEventListener('click', function () {
+      currentChartDate.setMonth(currentChartDate.getMonth() - 1);
+      perbaruiTampilanBulanTahun();
+      inisialisasiGrafik();
+    });
+
+    document.getElementById('nextMonthBtn').addEventListener('click', function () {
+      currentChartDate.setMonth(currentChartDate.getMonth() + 1);
+      perbaruiTampilanBulanTahun();
+      inisialisasiGrafik();
+    });
+
+    // Fungsi untuk logout
+    document.getElementById('logoutButton').addEventListener('click', function (e) {
+      e.preventDefault();
+      auth.signOut();
+    });
+
+    // Fungsi untuk dropdown profil
+    document.getElementById('profileButton').addEventListener('click', function () {
+      document.getElementById('profileDropdown').classList.toggle('hidden');
+    });
+
+    // Tutup dropdown ketika klik di luar
+    window.addEventListener('click', function (e) {
+      if (!e.target.closest('#profileButton')) {
+        document.getElementById('profileDropdown').classList.add('hidden');
+      }
+    });
+
+    // Inisialisasi animasi background
+    document.addEventListener('DOMContentLoaded', function () {
+      // Buat elemen animasi
+      for (let i = 0; i < 8; i++) {
+        const anim = document.createElement('div');
+        anim.className = i % 3 === 0 ? 'coin-animation bg-animation' :
+          i % 3 === 1 ? 'bill-animation bg-animation' :
+            'graph-animation bg-animation';
+        anim.style.left = `${Math.random() * 100}vw`;
+        anim.style.top = `${Math.random() * 100}vh`;
+        anim.style.animationDelay = `${Math.random() * 15}s`;
+        document.getElementById('animationContainer').appendChild(anim);
+      }
+    });
+  </script>
+</body>
+
+</html>

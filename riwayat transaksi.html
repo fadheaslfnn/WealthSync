@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Riwayat & Laporan Transaksi - WealthSync</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+
+  <style>
+    body {
+      background: linear-gradient(to right, #e6f7e9, #f9e6f7);
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .main-container {
+      margin: 20px;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    h2 {
+      color: #2e7d32;
+      font-weight: bold;
+      margin-bottom: 30px;
+    }
+
+    .filter-bar {
+      margin-bottom: 20px;
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    table {
+      margin-top: 20px;
+      animation: slideUp 0.8s ease-in-out;
+    }
+
+    .btn-export {
+      background-color: #4CAF50;
+      color: white;
+      border-radius: 10px;
+    }
+
+    .btn-export:hover {
+      background-color: #2e7d32;
+    }
+
+    .table thead {
+      background-color: #c8e6c9;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(40px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Warna jenis transaksi */
+    .income {
+      color: #2e7d32;
+    }
+
+    .expense {
+      color: #e53935;
+    }
+
+    .savings {
+      color: #1976d2;
+    }
+
+    /* Dropdown profil */
+    .profile-dropdown {
+      display: none;
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background-color: white;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.1);
+      z-index: 1;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .profile-dropdown a {
+      color: #333;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+
+    .profile-dropdown a:hover {
+      background-color: #f1f1f1;
+    }
+
+    .show {
+      display: block;
+    }
+
+    /* Gaya Header */
+    header {
+      background-color: #2e7d32;
+      color: white;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 1rem;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .logo {
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      gap: 1rem;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      transition: background-color 0.3s;
+      border-radius: 0.5rem;
+    }
+
+    .nav-links a:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .nav-links a i {
+      margin-right: 0.5rem;
+    }
+
+    .profile-container {
+      position: relative;
+    }
+
+    #profileButton {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: white;
+      padding: 0.5rem;
+    }
+
+    #profileImage {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .profile-dropdown {
+      position: absolute;
+      right: 0;
+      top: 100%;
+      background: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 0.5rem 0;
+      width: 200px;
+      display: none;
+      z-index: 10;
+    }
+
+    .profile-dropdown a {
+      display: block;
+      padding: 0.5rem 1rem;
+      color: #333;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .profile-dropdown a:hover {
+      background: #f0f0f0;
+    }
+
+    .profile-dropdown i {
+      width: 1.25rem;
+      text-align: center;
+      margin-right: 0.5rem;
+    }
+
+    .login-status {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 1rem;
+      margin-left: 0.5rem;
+    }
+
+    .logged-in {
+      background-color: rgba(76, 175, 80, 0.3);
+    }
+
+    .logged-out {
+      background-color: rgba(229, 57, 53, 0.3);
+    }
+
+    /* Gaya Responsif */
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+
+      .header-content {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .logo {
+        margin-right: auto;
+      }
+    }
+
+    /* Penyesuaian konten utama */
+    .content-wrapper {
+      padding: 20px;
+      margin-top: 60px;
+    }
+
+    /* Gaya Responsif */
+    @media (max-width: 992px) {
+      .nav-links {
+        position: static;
+        transform: none;
+        left: auto;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .main-container {
+        padding: 20px;
+        margin: 10px;
+        width: calc(100% - 20px);
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      .mobile-menu-btn {
+        display: block;
+      }
+
+      header {
+        flex-direction: column;
+        padding: 10px;
+      }
+
+      .nav-container {
+        width: 100%;
+        justify-content: space-between;
+      }
+
+      .content-wrapper {
+        margin-top: 80px;
+      }
+    }
+
+    /* Spinner untuk loading */
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border-left-color: #2e7d32;
+      animation: spin 1s linear infinite;
+      margin: 20px auto;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
+    }
+
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .table-container {
+      position: relative;
+      min-height: 200px;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+
+    /* Gaya manajemen kategori */
+    .category-manager {
+      margin-top: 40px;
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    .category-section {
+      margin-bottom: 20px;
+    }
+
+    .category-title {
+      font-weight: 600;
+      color: #2e7d32;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .category-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .category-item {
+      display: flex;
+      align-items: center;
+      background: #f0f0f0;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .category-item .delete-category {
+      margin-left: 5px;
+      color: #e53935;
+      cursor: pointer;
+      font-size: 12px;
+    }
+
+    .add-category-form {
+      display: flex;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .add-category-input {
+      flex-grow: 1;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+
+    .add-category-btn {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      padding: 8px 15px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .add-category-btn:hover {
+      background: #2e7d32;
+    }
+
+    /* Input kategori custom */
+    .category-input-container {
+      position: relative;
+      width: 100%;
+    }
+
+    .category-input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+
+    .category-suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background: white;
+      border: 1px solid #ddd;
+      border-top: none;
+      border-radius: 0 0 5px 5px;
+      z-index: 10;
+      max-height: 200px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .category-suggestion {
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    .category-suggestion:hover {
+      background-color: #f0f0f0;
+    }
+
+    /* Modal untuk kategori baru */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 500px;
+      border-radius: 10px;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover {
+      color: black;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header dengan Navigasi -->
+  <header>
+    <div class="header-content">
+      <div class="logo">💰 WealthSync</div>
+
+      <ul class="nav-links">
+        <li><a href="dashboard.html"></i> Dashboard</a></li>
+        <li><a href="tambah transaksi.html"></i> Tambah Transaksi</a></li>
+        <li><a href="riwayat transaksi.html"></i> Riwayat & Laporan</a></li>
+        <li><a href="pengaturan akun.html"></i> Pengaturan</a></li>
+      </ul>
+
+      <div class="profile-container">
+        <button id="profileButton">
+          <img id="profileImage" src="https://ui-avatars.com/api/?name=User&background=4CAF50&color=fff" alt="Profil">
+          <span id="profileName">Pengguna</span>
+          <span id="loginStatus" class="login-status logged-out">Offline</span>
+        </button>
+        <div id="profileDropdown" class="profile-dropdown">
+          <a href="pengaturan akun.html"><i class="fas fa-user"></i> Profil Saya</a>
+          <a href="pengaturan akun.html"><i class="fas fa-cog"></i> Pengaturan</a>
+          <a href="#" id="logoutButton"><i class="fas fa-sign-out-alt"></i> Keluar</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Konten Utama -->
+  <div class="content-wrapper">
+    <div class="main-container">
+      <h2 class="text-center"></i> Riwayat & Laporan Transaksi</h2>
+
+      <div class="filter-bar">
+        <input type="date" id="startDate" class="form-control" placeholder="Dari Tanggal">
+        <input type="date" id="endDate" class="form-control" placeholder="Sampai Tanggal">
+        <select class="form-select" id="typeFilter">
+          <option value="">Semua Jenis</option>
+          <option value="income">Pemasukan</option>
+          <option value="expense">Pengeluaran</option>
+        </select>
+        <div class="category-input-container">
+          <input type="text" id="categoryFilterInput" class="form-control category-input" placeholder="Cari Kategori">
+          <div id="categorySuggestions" class="category-suggestions"></div>
+        </div>
+        <button class="btn btn-success" id="filterButton">Filter</button>
+        <div class="ms-auto d-flex gap-2">
+          <button class="btn btn-export" id="exportPDF"><i class="fas fa-file-pdf"></i> Export PDF</button>
+          <button class="btn btn-export" id="exportExcel"><i class="fas fa-file-excel"></i> Export Excel</button>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <div id="loadingOverlay" class="loading-overlay">
+          <div class="spinner"></div>
+        </div>
+        <table class="table table-hover table-bordered" id="transactionsTable">
+          <thead>
+            <tr>
+              <th>Tanggal</th>
+              <th>Jenis</th>
+              <th>Kategori</th>
+              <th>Jumlah (Rp)</th>
+              <th>Catatan</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody id="transactionTableBody">
+            <!-- Transaksi akan diisi dari Firebase -->
+          </tbody>
+        </table>
+        <div id="emptyState" class="empty-state" style="display: none;">
+          <i class="fas fa-inbox fa-3x mb-3"></i>
+          <h4>Belum ada transaksi</h4>
+          <p class="text-muted">Tambahkan transaksi baru untuk melihat riwayat di sini</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal untuk kategori baru -->
+  <div id="newCategoryModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h4>Tambah Kategori Baru</h4>
+      <div class="mb-3">
+        <label for="newCategoryName" class="form-label">Nama Kategori</label>
+        <input type="text" class="form-control" id="newCategoryName" placeholder="Masukkan nama kategori">
+      </div>
+      <div class="mb-3">
+        <label for="newCategoryType" class="form-label">Jenis Kategori</label>
+        <select class="form-select" id="newCategoryType">
+          <option value="income">Pemasukan</option>
+          <option value="expense">Pengeluaran</option>
+          <option value="savings">Tabungan</option>
+        </select>
+      </div>
+      <button id="confirmAddCategory" class="btn btn-success">Simpan Kategori</button>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+
+  <script>
+    // Konfigurasi Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDx27o0bbjyzvXi2JmrabmMj4FMEQmatno",
+      authDomain: "wealthsync-d8cda.firebaseapp.com",
+      databaseURL: "https://wealthsync-d8cda-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "wealthsync-d8cda",
+      storageBucket: "wealthsync-d8cda.firebasestorage.app",
+      messagingSenderId: "431567262192",
+      appId: "1:431567262192:web:93174cc8360cc974000d35",
+      measurementId: "G-0HYTM7BGB1"
+    };
+
+    // Inisialisasi Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    // Variabel global
+    let currentUser = null;
+    let allTransactions = [];
+    let allCategories = {
+      income: [],
+      expense: [],
+      savings: []
+    };
+
+    // Elemen DOM
+    const profileImage = document.getElementById('profileImage');
+    const profileName = document.getElementById('profileName');
+    const loginStatus = document.getElementById('loginStatus');
+    const transactionTableBody = document.getElementById('transactionTableBody');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const emptyState = document.getElementById('emptyState');
+    const logoutButton = document.getElementById('logoutButton');
+    const filterButton = document.getElementById('filterButton');
+    const typeFilter = document.getElementById('typeFilter');
+    const categoryFilterInput = document.getElementById('categoryFilterInput');
+    const categorySuggestions = document.getElementById('categorySuggestions');
+    const startDateInput = document.getElementById('startDate');
+    const endDateInput = document.getElementById('endDate');
+    const profileDropdown = document.getElementById('profileDropdown');
+    const newCategoryModal = document.getElementById('newCategoryModal');
+    const closeModal = document.querySelector('.close');
+    const confirmAddCategory = document.getElementById('confirmAddCategory');
+    const newCategoryName = document.getElementById('newCategoryName');
+    const newCategoryType = document.getElementById('newCategoryType');
+
+    // Set tanggal hari ini sebagai default end date
+    const today = new Date();
+    const formattedToday = today.toISOString().split('T')[0];
+    endDateInput.value = formattedToday;
+
+    // Set tanggal pertama bulan ini sebagai default start date
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const formattedFirstDay = firstDayOfMonth.toISOString().split('T')[0];
+    startDateInput.value = formattedFirstDay;
+
+    // Cek status autentikasi
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        currentUser = user;
+
+        // Update status login
+        loginStatus.textContent = "Online";
+        loginStatus.classList.remove('logged-out');
+        loginStatus.classList.add('logged-in');
+
+        // Coba dapatkan profil pengguna dari localStorage dulu
+        const savedProfile = localStorage.getItem('wealthsync_user_profile');
+        if (savedProfile) {
+          const profileData = JSON.parse(savedProfile);
+          profileName.textContent = profileData.name;
+          profileImage.src = profileData.image;
+        }
+
+        muatProfilPengguna();
+        muatKategori();
+        muatTransaksi();
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const isEditMode = urlParams.get('edit') === 'true';
+        const editTransactionId = localStorage.getItem('editTransactionId');
+
+        if (isEditMode && editTransactionId) {
+          muatTransaksiUntukEdit(editTransactionId);
+        }
+      } else {
+        // Pengguna keluar
+        loginStatus.textContent = "Offline";
+        loginStatus.classList.remove('logged-in');
+        loginStatus.classList.add('logged-out');
+
+        // Redirect ke halaman login
+        window.location.href = 'login.html';
+      }
+    });
+
+    // Muat data profil pengguna
+    function muatProfilPengguna() {
+      firebase.database().ref('users/' + currentUser.uid).once('value').then(function (snapshot) {
+        const userData = snapshot.val();
+        if (userData) {
+          const displayName = userData.profile?.name || userData.displayName || currentUser.email.split('@')[0];
+          profileName.textContent = displayName;
+
+          const profileImageSrc = userData.profile?.image || userData.photoURL ||
+            `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=4CAF50&color=fff`;
+
+          profileImage.src = profileImageSrc;
+
+          localStorage.setItem('wealthsync_user_profile', JSON.stringify({
+            name: displayName,
+            image: profileImageSrc
+          }));
+        } else {
+          const userName = currentUser.displayName || currentUser.email.split('@')[0];
+          const newUserData = {
+            profile: {
+              name: userName,
+              email: currentUser.email,
+              image: `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=4CAF50&color=fff`
+            },
+            balance: 0,
+            monthlyIncome: 0,
+            monthlyExpense: 0,
+            monthlySavings: 0,
+            monthlyBalance: 0,
+            totalSavings: 0,
+            createdAt: firebase.database.ServerValue.TIMESTAMP
+          };
+
+          firebase.database().ref('users/' + currentUser.uid).set(newUserData);
+
+          profileName.textContent = userName;
+          profileImage.src = newUserData.profile.image;
+
+          localStorage.setItem('wealthsync_user_profile', JSON.stringify({
+            name: userName,
+            image: newUserData.profile.image
+          }));
+        }
+      }).catch(function (error) {
+        console.error("Error loading user profile:", error);
+      });
+    }
+
+    // Muat kategori transaksi
+    function muatKategori() {
+      tampilkanLoading();
+
+      firebase.database().ref('users/' + currentUser.uid + '/categories').once('value').then(function (snapshot) {
+        const userCategories = snapshot.val();
+
+        if (!userCategories) {
+          // Set kategori default jika tidak ada
+          allCategories = {
+            income: ["Gaji", "Bonus", "Investasi", "Hadiah", "Lainnya"],
+            expense: ["Makanan", "Transportasi", "Belanja", "Hiburan", "Pendidikan", "Kesehatan", "Tagihan", "Lainnya"],
+            savings: ["Tabungan Pendidikan", "Dana Darurat", "Tabungan Rumah", "Tabungan Kendaraan", "Lainnya"]
+          };
+
+          firebase.database().ref('users/' + currentUser.uid + '/categories').set(allCategories)
+            .then(() => {
+              sembunyikanLoading();
+            });
+        } else {
+          allCategories = userCategories;
+          sembunyikanLoading();
+        }
+      }).catch(function (error) {
+        console.error("Error loading categories:", error);
+        sembunyikanLoading();
+      });
+    }
+
+    // Handle input dan saran kategori
+    categoryFilterInput.addEventListener('input', function () {
+      const searchTerm = this.value.toLowerCase();
+      categorySuggestions.innerHTML = '';
+
+      if (searchTerm.length < 1) {
+        categorySuggestions.style.display = 'none';
+        return;
+      }
+
+      // Kumpulkan semua kategori dari semua jenis
+      let allCategoryList = [];
+      for (const type in allCategories) {
+        allCategoryList = allCategoryList.concat(allCategories[type]);
+      }
+
+      // Filter kategori unik
+      const uniqueCategories = [...new Set(allCategoryList)];
+
+      // Filter kategori berdasarkan kata kunci pencarian
+      const matchedCategories = uniqueCategories.filter(cat =>
+        cat.toLowerCase().includes(searchTerm)
+      );
+
+      if (matchedCategories.length > 0) {
+        matchedCategories.forEach(cat => {
+          const suggestion = document.createElement('div');
+          suggestion.className = 'category-suggestion';
+          suggestion.textContent = cat;
+          suggestion.addEventListener('click', function () {
+            categoryFilterInput.value = cat;
+            categorySuggestions.style.display = 'none';
+          });
+          categorySuggestions.appendChild(suggestion);
+        });
+        categorySuggestions.style.display = 'block';
+      } else {
+        // Tampilkan opsi untuk menambah kategori baru
+        const addNew = document.createElement('div');
+        addNew.className = 'category-suggestion';
+        addNew.innerHTML = `<i class="fas fa-plus"></i> Tambah kategori baru: "${searchTerm}"`;
+        addNew.addEventListener('click', function () {
+          tampilkanModalKategoriBaru(searchTerm);
+        });
+        categorySuggestions.appendChild(addNew);
+        categorySuggestions.style.display = 'block';
+      }
+    });
+
+    // Tutup saran saat klik di luar
+    document.addEventListener('click', function (e) {
+      if (e.target !== categoryFilterInput) {
+        categorySuggestions.style.display = 'none';
+      }
+    });
+
+    // Tampilkan modal untuk kategori baru
+    function tampilkanModalKategoriBaru(namaKategori = '') {
+      newCategoryName.value = namaKategori;
+      newCategoryModal.style.display = 'block';
+    }
+
+    // Tutup modal
+    closeModal.addEventListener('click', function () {
+      newCategoryModal.style.display = 'none';
+    });
+
+    // Tutup modal saat klik di luar
+    window.addEventListener('click', function (e) {
+      if (e.target === newCategoryModal) {
+        newCategoryModal.style.display = 'none';
+      }
+    });
+
+    // Tambah kategori baru
+    confirmAddCategory.addEventListener('click', function () {
+      const namaKategori = newCategoryName.value.trim();
+      const jenisKategori = newCategoryType.value;
+
+      if (!namaKategori) {
+        alert('Nama kategori tidak boleh kosong!');
+        return;
+      }
+
+      // Cek apakah kategori sudah ada di jenis apapun
+      let kategoriSudahAda = false;
+      for (const jenis in allCategories) {
+        if (allCategories[jenis].includes(namaKategori)) {
+          kategoriSudahAda = true;
+          break;
+        }
+      }
+
+      if (kategoriSudahAda) {
+        alert('Kategori ini sudah ada!');
+        return;
+      }
+
+      // Tambahkan kategori ke jenis yang dipilih
+      const kategoriDiperbarui = [...allCategories[jenisKategori], namaKategori];
+
+      firebase.database().ref('users/' + currentUser.uid + '/categories/' + jenisKategori).set(kategoriDiperbarui)
+        .then(() => {
+          // Update data lokal
+          allCategories[jenisKategori] = kategoriDiperbarui;
+
+          // Tutup modal dan update input
+          newCategoryModal.style.display = 'none';
+          categoryFilterInput.value = namaKategori;
+          newCategoryName.value = '';
+
+          alert('Kategori berhasil ditambahkan!');
+        })
+        .catch(error => {
+          console.error("Error adding category:", error);
+          alert("Gagal menambahkan kategori. Silakan coba lagi.");
+        });
+    });
+
+    // Muat transaksi dari Firebase
+    function muatTransaksi() {
+      tampilkanLoading();
+
+      firebase.database().ref(`transactions/${currentUser.uid}`)
+        .once('value')
+        .then(function (snapshot) {
+          allTransactions = [];
+          const transactionsData = snapshot.val();
+
+          if (transactionsData) {
+            Object.keys(transactionsData).forEach(key => {
+              allTransactions.push({
+                id: key,
+                ...transactionsData[key]
+              });
+            });
+
+            // Urutkan berdasarkan tanggal (terbaru dulu)
+            allTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            // Update ringkasan keuangan di data pengguna
+            perbaruiRingkasanKeuangan();
+
+            terapkanFilter();
+          } else {
+            transactionTableBody.innerHTML = '';
+            emptyState.style.display = 'block';
+            document.getElementById('transactionsTable').style.display = 'none';
+          }
+
+          sembunyikanLoading();
+        })
+        .catch(function (error) {
+          console.error("Error loading transactions:", error);
+          sembunyikanLoading();
+        });
+    }
+
+    // Perbarui ringkasan keuangan berdasarkan transaksi
+    function perbaruiRingkasanKeuangan() {
+      if (!currentUser) return;
+
+      // Hitung total bulan berjalan
+      const sekarang = new Date();
+      const bulanIni = sekarang.getMonth();
+      const tahunIni = sekarang.getFullYear();
+
+      let pemasukanBulanan = 0;
+      let pengeluaranBulanan = 0;
+      let tabunganBulanan = 0;
+      let saldo = 0;
+      let totalTabungan = 0;
+
+      allTransactions.forEach(transaksi => {
+        const jumlah = Number(transaksi.amount);
+        const tanggalTrans = new Date(transaksi.date);
+
+        // Perhitungan untuk semua transaksi (saldo total)
+        if (transaksi.type === 'income') {
+          saldo += jumlah;
+        } else if (transaksi.type === 'expense') {
+          saldo -= jumlah;
+        } else if (transaksi.type === 'savings') {
+          totalTabungan += jumlah;
+          saldo -= jumlah; // Tabungan mengurangi saldo utama
+        }
+
+        // Perhitungan untuk bulan berjalan
+        if (tanggalTrans.getMonth() === bulanIni && tanggalTrans.getFullYear() === tahunIni) {
+          if (transaksi.type === 'income') {
+            pemasukanBulanan += jumlah;
+          } else if (transaksi.type === 'expense') {
+            pengeluaranBulanan += jumlah;
+          } else if (transaksi.type === 'savings') {
+            tabunganBulanan += jumlah;
+          }
+        }
+      });
+
+      const saldoBulanan = pemasukanBulanan - pengeluaranBulanan - tabunganBulanan;
+
+      // Perbarui data pengguna di Firebase
+      firebase.database().ref(`users/${currentUser.uid}`).update({
+        balance: saldo,
+        totalSavings: totalTabungan,
+        monthlyIncome: pemasukanBulanan,
+        monthlyExpense: pengeluaranBulanan,
+        monthlySavings: tabunganBulanan,
+        monthlyBalance: saldoBulanan,
+        updatedAt: firebase.database.ServerValue.TIMESTAMP
+      }).catch(error => {
+        console.error("Error updating user financial summary:", error);
+      });
+    }
+
+    // Terapkan filter ke transaksi
+    function terapkanFilter() {
+      const tanggalMulai = startDateInput.value;
+      const tanggalSelesai = endDateInput.value;
+      const jenis = typeFilter.value;
+      const kategori = categoryFilterInput.value;
+
+      tampilkanLoading();
+
+      let transaksiTersaring = [...allTransactions];
+
+      if (tanggalMulai) {
+        transaksiTersaring = transaksiTersaring.filter(t => t.date >= tanggalMulai);
+      }
+
+      if (tanggalSelesai) {
+        transaksiTersaring = transaksiTersaring.filter(t => t.date <= tanggalSelesai);
+      }
+
+      if (jenis) {
+        transaksiTersaring = transaksiTersaring.filter(t => t.type === jenis);
+      }
+
+      if (kategori) {
+        transaksiTersaring = transaksiTersaring.filter(t => t.category === kategori);
+      }
+
+      perbaruiTabelTransaksi(transaksiTersaring);
+
+      sembunyikanLoading();
+    }
+
+    // Perbarui tabel transaksi dengan data
+    function perbaruiTabelTransaksi(transaksi) {
+      transactionTableBody.innerHTML = '';
+
+      if (transaksi.length === 0) {
+        emptyState.style.display = 'block';
+        document.getElementById('transactionsTable').style.display = 'none';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+      document.getElementById('transactionsTable').style.display = 'table';
+
+      transaksi.forEach(transaksi => {
+        const baris = document.createElement('tr');
+
+        const objekTanggal = new Date(transaksi.date);
+        const tanggalTerformat = objekTanggal.toLocaleDateString('id-ID');
+        const jumlahTerformat = parseInt(transaksi.amount).toLocaleString('id-ID');
+
+        let teksJenis, kelasJenis;
+        if (transaksi.type === 'income') {
+          teksJenis = 'Pemasukan';
+          kelasJenis = 'income';
+        } else if (transaksi.type === 'expense') {
+          teksJenis = 'Pengeluaran';
+          kelasJenis = 'expense';
+        } else {
+          teksJenis = 'Tabungan';
+          kelasJenis = 'savings';
+        }
+
+        baris.innerHTML = `
+          <td>${tanggalTerformat}</td>
+          <td class="${kelasJenis}">${teksJenis}</td>
+          <td>${transaksi.category}</td>
+          <td class="text-right">${jumlahTerformat}</td>
+          <td>${transaksi.notes || '-'}</td>
+          <td>
+            <div class="d-flex gap-2">
+              <button class="btn btn-sm btn-warning edit-btn" data-id="${transaksi.id}">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-sm btn-danger delete-btn" data-id="${transaksi.id}">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        `;
+
+        transactionTableBody.appendChild(baris);
+      });
+
+      // Tambahkan event listener untuk tombol edit dan hapus
+      document.querySelectorAll('.edit-btn').forEach(button => {
+        button.addEventListener('click', function () {
+          const transaksiId = this.getAttribute('data-id');
+          localStorage.setItem('editTransactionId', transaksiId);
+          window.location.href = 'tambah transaksi.html?edit=true';
+        });
+      });
+
+      document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function () {
+          const transaksiId = this.getAttribute('data-id');
+          if (confirm('Anda yakin ingin menghapus transaksi ini?')) {
+            hapusTransaksi(transaksiId);
+          }
+        });
+      });
+    }
+
+    // Hapus transaksi
+    function hapusTransaksi(transaksiId) {
+      firebase.database().ref(`transactions/${currentUser.uid}/${transaksiId}`).remove()
+        .then(() => {
+          alert('Transaksi berhasil dihapus!');
+          muatTransaksi();
+        })
+        .catch(error => {
+          console.error("Error deleting transaction:", error);
+          alert('Gagal menghapus transaksi. Silakan coba lagi.');
+        });
+    }
+
+
+
+    // Export data ke PDF
+    // Fungsi export PDF yang sudah diperbaiki
+    document.getElementById('exportPDF').addEventListener('click', async function () {
+      try {
+        // Periksa apakah library sudah dimuat
+        if (typeof window.jspdf !== 'undefined') {
+          // Import jsPDF dari namespace global
+          const { jsPDF } = window.jspdf;
+
+          // Buat dokumen PDF baru
+          const doc = new jsPDF({
+            orientation: 'landscape',
+            unit: 'mm',
+            format: 'a4'
+          });
+
+          // Header dokumen
+          doc.setFontSize(18);
+          doc.text('Laporan Transaksi WealthSync', 105, 15, { align: 'center' });
+
+          // Informasi filter
+          const filterInfo = getFilterInfo();
+          doc.setFontSize(10);
+          doc.text(`Tanggal Laporan: ${new Date().toLocaleDateString('id-ID')}`, 15, 25);
+          doc.text(`Filter: ${filterInfo.join(' | ') || 'Semua Transaksi'}`, 15, 30);
+
+          // Data transaksi
+          const transaksiTersaring = saringTransaksi();
+          const { headers, data } = prepareTableData(transaksiTersaring);
+          const totals = hitungTotalTransaksi(transaksiTersaring);
+
+          // Tambahkan tabel
+          doc.autoTable({
+            startY: 40,
+            head: [headers],
+            body: data,
+            theme: 'grid',
+            styles: {
+              fontSize: 8,
+              cellPadding: 2,
+            },
+            columnStyles: {
+              0: { cellWidth: 25 },
+              1: { cellWidth: 25 },
+              2: { cellWidth: 35 },
+              3: { cellWidth: 30, halign: 'right' },
+              4: { cellWidth: 'auto' }
+            }
+          });
+
+          // Tambahkan ringkasan
+          const finalY = doc.lastAutoTable.finalY + 10;
+          doc.setFontSize(10);
+          doc.text(`Total Pemasukan: Rp ${totals.totalPemasukan.toLocaleString('id-ID')}`, 15, finalY);
+          doc.text(`Total Pengeluaran: Rp ${totals.totalPengeluaran.toLocaleString('id-ID')}`, 15, finalY + 6);
+          doc.text(`Total Tabungan: Rp ${totals.totalTabungan.toLocaleString('id-ID')}`, 15, finalY + 12);
+          doc.text(`Saldo: Rp ${totals.saldo.toLocaleString('id-ID')}`, 15, finalY + 18);
+
+          // Simpan PDF
+          doc.save('laporan-transaksi-wealthsync.pdf');
+        } else {
+          // Jika library tidak terdeteksi, coba muat ulang
+          if (confirm('Library PDF tidak terdeteksi. Muat ulang halaman?')) {
+            location.reload();
+          }
+        }
+      } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Terjadi kesalahan saat membuat PDF: ' + error.message);
+      }
+    });
+
+    // Fungsi pembantu
+    function getFilterInfo() {
+      const filterInfo = [];
+      if (startDateInput.value) filterInfo.push(`Dari: ${startDateInput.value}`);
+      if (endDateInput.value) filterInfo.push(`Sampai: ${endDateInput.value}`);
+      if (typeFilter.value) {
+        const typeName = {
+          'income': 'Pemasukan',
+          'expense': 'Pengeluaran',
+          'savings': 'Tabungan'
+        }[typeFilter.value];
+        filterInfo.push(`Jenis: ${typeName}`);
+      }
+      if (categoryFilterInput.value) filterInfo.push(`Kategori: ${categoryFilterInput.value}`);
+      return filterInfo;
+    }
+
+    function prepareTableData(transactions) {
+      const headers = ['Tanggal', 'Jenis', 'Kategori', 'Jumlah (Rp)', 'Catatan'];
+      const data = transactions.map(t => {
+        const date = new Date(t.date).toLocaleDateString('id-ID');
+        const amount = parseInt(t.amount).toLocaleString('id-ID');
+        const type = {
+          'income': 'Pemasukan',
+          'expense': 'Pengeluaran',
+          'savings': 'Tabungan'
+        }[t.type];
+
+        return [date, type, t.category, amount, t.notes || '-'];
+      });
+
+      return { headers, data };
+    }
+
+    // Fungsi untuk menyaring transaksi
+    function saringTransaksi() {
+      const tanggalMulai = startDateInput.value;
+      const tanggalSelesai = endDateInput.value;
+      const jenis = typeFilter.value;
+      const kategori = categoryFilterInput.value;
+
+      let transaksiTersaring = [...allTransactions];
+
+      if (tanggalMulai) {
+        transaksiTersaring = transaksiTersaring.filter(t => t.date >= tanggalMulai);
+      }
+
+      if (tanggalSelesai) {
+        transaksiTersaring = transaksiTersaring.filter(t => t.date <= tanggalSelesai);
+      }
+
+      if (jenis) {
+        transaksiTersaring = transaksiTersaring.filter(t => t.type === jenis);
+      }
+
+      if (kategori) {
+        transaksiTersaring = transaksiTersaring.filter(t => t.category === kategori);
+      }
+
+      return transaksiTersaring;
+    }
+
+    // Fungsi untuk menghitung total transaksi
+    function hitungTotalTransaksi(transaksi) {
+      let totalPemasukan = 0;
+      let totalPengeluaran = 0;
+      let totalTabungan = 0;
+
+      transaksi.forEach(t => {
+        if (t.type === 'income') {
+          totalPemasukan += Number(t.amount);
+        } else if (t.type === 'expense') {
+          totalPengeluaran += Number(t.amount);
+        } else if (t.type === 'savings') {
+          totalTabungan += Number(t.amount);
+        }
+      });
+
+      const saldo = totalPemasukan - totalPengeluaran - totalTabungan;
+
+      return { totalPemasukan, totalPengeluaran, totalTabungan, saldo };
+    }
+
+    // Export data ke Excel
+    document.getElementById('exportExcel').addEventListener('click', function () {
+      const tanggalMulai = startDateInput.value;
+      const tanggalSelesai = endDateInput.value;
+      const jenis = typeFilter.value;
+      const kategori = categoryFilterInput.value;
+
+      let transaksiTersaring = [...allTransactions];
+
+      if (tanggalMulai) {
+        transaksiTersaring = transaksiTersaring.filter(t => t.date >= tanggalMulai);
+      }
+
+      if (tanggalSelesai) {
+        transaksiTersaring = transaksiTersaring.filter(t => t.date <= tanggalSelesai);
+      }
+
+      if (jenis) {
+        transaksiTersaring = transaksiTersaring.filter(t => t.type === jenis);
+      }
+
+      if (kategori) {
+        transaksiTersaring = transaksiTersaring.filter(t => t.category === kategori);
+      }
+
+      // Persiapkan data
+      const workbook = XLSX.utils.book_new();
+
+      // Buat worksheet
+      const wsData = [
+        ['Laporan Transaksi WealthSync'],
+        [`Tanggal Laporan: ${new Date().toLocaleDateString('id-ID')}`],
+        [],
+        ['Tanggal', 'Jenis', 'Kategori', 'Jumlah (Rp)', 'Catatan']
+      ];
+
+      transaksiTersaring.forEach(t => {
+        const objekTanggal = new Date(t.date);
+        const tanggalTerformat = objekTanggal.toLocaleDateString('id-ID');
+
+        let teksJenis;
+        if (t.type === 'income') {
+          teksJenis = 'Pemasukan';
+        } else if (t.type === 'expense') {
+          teksJenis = 'Pengeluaran';
+        } else {
+          teksJenis = 'Tabungan';
+        }
+
+        wsData.push([
+          tanggalTerformat,
+          teksJenis,
+          t.category,
+          Number(t.amount),
+          t.notes || '-'
+        ]);
+      });
+
+      // Hitung total
+      let totalPemasukan = 0;
+      let totalPengeluaran = 0;
+      let totalTabungan = 0;
+
+      transaksiTersaring.forEach(t => {
+        if (t.type === 'income') {
+          totalPemasukan += Number(t.amount);
+        } else if (t.type === 'expense') {
+          totalPengeluaran += Number(t.amount);
+        } else if (t.type === 'savings') {
+          totalTabungan += Number(t.amount);
+        }
+      });
+
+      const saldo = totalPemasukan - totalPengeluaran - totalTabungan;
+
+      // Tambahkan ringkasan
+      wsData.push([]);
+      wsData.push(['Total Pemasukan:', totalPemasukan]);
+      wsData.push(['Total Pengeluaran:', totalPengeluaran]);
+      wsData.push(['Total Tabungan:', totalTabungan]);
+      wsData.push(['Saldo:', saldo]);
+
+      // Buat worksheet dan tambahkan ke workbook
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      XLSX.utils.book_append_sheet(workbook, ws, 'Laporan Transaksi');
+
+      // Ekspor ke file Excel
+      XLSX.writeFile(workbook, 'laporan-transaksi-wealthsync.xlsx');
+    });
+
+    // Fungsi untuk menampilkan overlay loading
+    function tampilkanLoading() {
+      loadingOverlay.style.display = 'flex';
+    }
+
+    // Fungsi untuk menyembunyikan overlay loading
+    function sembunyikanLoading() {
+      loadingOverlay.style.display = 'none';
+    }
+
+    // Toggle dropdown profil
+    document.getElementById('profileButton').addEventListener('click', function () {
+      profileDropdown.classList.toggle('show');
+    });
+
+    // Tutup dropdown saat klik di luar
+    window.addEventListener('click', function (e) {
+      if (!e.target.matches('#profileButton') && !e.target.matches('#profileImage') && !e.target.matches('#profileName')) {
+        if (profileDropdown.classList.contains('show')) {
+          profileDropdown.classList.remove('show');
+        }
+      }
+    });
+
+    // Fungsi logout
+    logoutButton.addEventListener('click', function () {
+      firebase.auth().signOut().then(function () {
+        // Sign-out berhasil
+        localStorage.removeItem('wealthsync_user_profile');
+        window.location.href = 'login.html';
+      }).catch(function (error) {
+        // Terjadi error
+        console.error("Error signing out:", error);
+      });
+    });
+
+    // Event listener untuk tombol filter
+    filterButton.addEventListener('click', function () {
+      terapkanFilter();
+    });
+
+    // Perbaikan: Tambahkan fungsi khusus untuk memperbarui data tabungan dan sinkronisasi dengan ringkasan keuangan
+    function perbaruiDataTabungan() {
+      if (!currentUser) return;
+
+      // Hitung total tabungan dari semua transaksi tabungan
+      let totalTabungan = 0;
+
+      allTransactions.forEach(transaksi => {
+        if (transaksi.type === 'savings') {
+          totalTabungan += Number(transaksi.amount);
+        }
+      });
+
+      // Perbarui total tabungan di data pengguna
+      firebase.database().ref(`users/${currentUser.uid}`).update({
+        totalSavings: totalTabungan,
+        updatedAt: firebase.database.ServerValue.TIMESTAMP
+      }).catch(error => {
+        console.error("Error updating savings data:", error);
+      });
+
+      return totalTabungan;
+    }
+
+    // Modifikasi fungsi perbaruiRingkasanKeuangan untuk memastikan tabungan dihitung dengan benar
+    function perbaruiRingkasanKeuangan() {
+      if (!currentUser) return;
+
+      // Hitung total bulan berjalan
+      const sekarang = new Date();
+      const bulanIni = sekarang.getMonth();
+      const tahunIni = sekarang.getFullYear();
+
+      let pemasukanBulanan = 0;
+      let pengeluaranBulanan = 0;
+      let tabunganBulanan = 0;
+      let saldo = 0;
+
+      // Hitung ulang total tabungan - ini adalah perbaikan utama
+      let totalTabungan = perbaruiDataTabungan();
+
+      allTransactions.forEach(transaksi => {
+        const jumlah = Number(transaksi.amount);
+        const tanggalTrans = new Date(transaksi.date);
+
+        // Perhitungan untuk semua transaksi (saldo total)
+        if (transaksi.type === 'income') {
+          saldo += jumlah;
+        } else if (transaksi.type === 'expense') {
+          saldo -= jumlah;
+        } else if (transaksi.type === 'savings') {
+          // Tabungan sudah dihitung secara terpisah di perbaruiDataTabungan
+          saldo -= jumlah; // Tabungan mengurangi saldo utama
+        }
+
+        // Perhitungan untuk bulan berjalan
+        if (tanggalTrans.getMonth() === bulanIni && tanggalTrans.getFullYear() === tahunIni) {
+          if (transaksi.type === 'income') {
+            pemasukanBulanan += jumlah;
+          } else if (transaksi.type === 'expense') {
+            pengeluaranBulanan += jumlah;
+          } else if (transaksi.type === 'savings') {
+            tabunganBulanan += jumlah;
+          }
+        }
+      });
+
+      const saldoBulanan = pemasukanBulanan - pengeluaranBulanan - tabunganBulanan;
+
+      // Perbarui data pengguna di Firebase
+      firebase.database().ref(`users/${currentUser.uid}`).update({
+        balance: saldo,
+        totalSavings: totalTabungan, // Gunakan nilai yang sudah dihitung
+        monthlyIncome: pemasukanBulanan,
+        monthlyExpense: pengeluaranBulanan,
+        monthlySavings: tabunganBulanan,
+        monthlyBalance: saldoBulanan,
+        updatedAt: firebase.database.ServerValue.TIMESTAMP
+      }).catch(error => {
+        console.error("Error updating user financial summary:", error);
+      });
+    }
+
+    // Sinkronisasi data tabungan saat menambah atau menghapus transaksi
+    function sinkronisasiDataTabungan(transaksiId, isDeleted = false) {
+      // Jika menghapus transaksi, perbarui total tabungan
+      if (isDeleted) {
+        muatTransaksi(); // Ini akan memuat ulang dan memanggil perbaruiRingkasanKeuangan
+        return;
+      }
+
+      // Dapatkan data transaksi
+      firebase.database().ref(`transactions/${currentUser.uid}/${transaksiId}`).once('value')
+        .then(snapshot => {
+          const transaksi = snapshot.val();
+
+          // Jika transaksi adalah tabungan, perbarui data tabungan
+          if (transaksi && transaksi.type === 'savings') {
+            perbaruiDataTabungan();
+            perbaruiRingkasanKeuangan();
+          }
+        })
+        .catch(error => {
+          console.error("Error syncing savings data:", error);
+        });
+    }
+
+    // Modifikasi fungsi hapusTransaksi untuk sinkronisasi data tabungan
+    function hapusTransaksi(transaksiId) {
+      // Dapatkan jenis transaksi sebelum dihapus
+      firebase.database().ref(`transactions/${currentUser.uid}/${transaksiId}`).once('value')
+        .then(snapshot => {
+          const transaksi = snapshot.val();
+          const isTabungan = transaksi && transaksi.type === 'savings';
+
+          // Hapus transaksi
+          return firebase.database().ref(`transactions/${currentUser.uid}/${transaksiId}`).remove()
+            .then(() => {
+              alert('Transaksi berhasil dihapus!');
+
+              // Jika transaksi adalah tabungan, sinkronkan data tabungan
+              if (isTabungan) {
+                sinkronisasiDataTabungan(transaksiId, true);
+              } else {
+                muatTransaksi();
+              }
+            });
+        })
+        .catch(error => {
+          console.error("Error deleting transaction:", error);
+          alert('Gagal menghapus transaksi. Silakan coba lagi.');
+        });
+    }
+
+    // Inisialisasi halaman
+    document.addEventListener('DOMContentLoaded', function () {
+      // Fungsi ini akan dipanggil setelah halaman dimuat
+    });
+  </script>
+</body>
+
+</html>
