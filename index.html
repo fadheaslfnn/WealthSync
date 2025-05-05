@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WealthSync - Financial Management</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: #e6f7f0;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 5%;
+            background-color: #fff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            color: #333;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .logo-image {
+            width: 35px;
+            height: 35px;
+            margin-right: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #3d9970;
+            border-bottom: 2px solid #3d9970;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.6rem 1.5rem;
+            border-radius: 100px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background-color: #3d9970;
+            color: white;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #2d8760;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: #333;
+            border: 1px solid #ccc;
+        }
+
+        .btn-secondary:hover {
+            border-color: #3d9970;
+            color: #3d9970;
+        }
+
+        /* Hero Section */
+        .hero {
+            display: flex;
+            padding: 2rem 5%;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 70vh;
+            flex-wrap: wrap;
+        }
+
+        .hero-content {
+            width: 100%;
+            max-width: 550px;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 1rem;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 2rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .hero-image {
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .app-mockup {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+        }
+
+        /* Sections */
+        .section {
+            padding: 4rem 5%;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: #3d9970;
+        }
+
+        .section-content {
+            max-width: 800px;
+            color: #555;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Features Grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .feature-title {
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .feature-description {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        /* Contact Info */
+        .contact-info {
+            line-height: 1.8;
+            font-size: 1.05rem;
+            color: #555;
+        }
+
+        .contact-info a {
+            color: #3d9970;
+            text-decoration: none;
+        }
+
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+
+        /* Animation */
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+                padding: 2rem;
+            }
+
+            .hero-content,
+            .hero-image {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.2rem;
+            }
+            
+            .section-title {
+                font-size: 2rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <a href="index.html" class="logo"> <!-- Changed to link to index.html -->
+            <img src="https://ik.imagekit.io/lgjlug7ma/wealthsync-removebg-preview.png" alt="WealthSync Logo" class="logo-image">
+            <span>WealthSync</span>
+        </a>
+        <nav class="nav-links">
+            <a href="index.html" class="active">Home</a> <!-- Changed to link to index.html -->
+            <a href="#about">About</a>
+            <a href="#features">Features</a>
+            <a href="#contact">Contact</a>
+        </nav>
+        <div class="auth-buttons">
+            <a href="register.html" class="btn btn-secondary">Register</a>
+            <a href="login.html" class="btn btn-primary">Login</a>
+        </div>
+    </header>
+
+    <main class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">WealthSync - Financial Management</h1>
+            <p class="hero-subtitle">
+                WealthSync adalah platform berbasis teknologi yang dirancang sebagai solusi inovatif untuk manajemen keuangan modern. 
+                Aplikasi ini menawarkan berbagai fitur unggulan yang mempermudah pengguna dalam mencatat transaksi keuangan.
+            </p>
+            <div class="hero-buttons">
+                <a href="login.html" class="btn btn-primary">Login</a>
+                <a href="register.html" class="btn btn-secondary">Register</a>
+            </div>
+        </div>
+
+        <div class="hero-image">
+            <img src="https://ik.imagekit.io/kluzco92v/Manage_money_Customizable_Isometric_Illustrations___Amico_Style-removebg-preview.png?updatedAt=1745888289964" alt="Ilustrasi Keuangan" class="app-mockup">
+        </div>
+    </main>
+
+    <!-- About Section -->
+    <section id="about" class="section" style="background-color: #fdfdfd;">
+        <h2 class="section-title">Tentang WealthSync</h2>
+        <p class="section-content">
+            WealthSync hadir sebagai sahabat setia Anda dalam mengelola keuangan. 
+            Aplikasi ini dirancang dengan pendekatan yang ramah pengguna, memungkinkan pencatatan pemasukan, pengeluaran, setoran rutin, serta perencanaan keuangan dalam satu platform terintegrasi. 
+            Cocok untuk individu, pelajar, hingga komunitas yang ingin lebih bijak dalam finansial.
+        </p>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="section" style="background-color: #e6f7f0;">
+        <h2 class="section-title">Fitur Unggulan</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <h4 class="feature-title">Pencatatan Keuangan</h4>
+                <p class="feature-description">Mencatat pemasukan dan pengeluaran dengan mudah.</p>
+            </div>
+            <div class="feature-card">
+                <h4 class="feature-title">Kategori Transaksi</h4>
+                <p class="feature-description">Kelompokkan transaksi berdasarkan kategori pilihan.</p>
+            </div>
+            <div class="feature-card">
+                <h4 class="feature-title">Laporan Keuangan</h4>
+                <p class="feature-description">Grafik dan laporan keuangan yang bisa diekspor.</p>
+            </div>
+            <div class="feature-card">
+                <h4 class="feature-title">Dashboard Interaktif</h4>
+                <p class="feature-description">Tampilkan ringkasan saldo, grafik, dan transaksi.</p>
+            </div>
+            <div class="feature-card">
+                <h4 class="feature-title">Login & Keamanan</h4>
+                <p class="feature-description">Akses aman dengan enkripsi dan verifikasi akun.</p>
+            </div>
+            <div class="feature-card">
+                <h4 class="feature-title">Pilihan Fitur</h4>
+                <p class="feature-description">Navigasi mudah ke fitur seperti transaksi dan laporan.</p>
+            </div>
+            <div class="feature-card">
+                <h4 class="feature-title">Tambah Transaksi</h4>
+                <p class="feature-description">Input cepat untuk pemasukan atau pengeluaran.</p>
+            </div>
+            <div class="feature-card">
+                <h4 class="feature-title">Riwayat Transaksi</h4>
+                <p class="feature-description">Lihat, filter, ekspor, edit, dan hapus transaksi.</p>
+            </div>
+            <div class="feature-card">
+                <h4 class="feature-title">Pengaturan Akun</h4>
+                <p class="feature-description">Edit data akun atau hapus akun untuk privasi.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section" style="background-color: #fdfdfd;">
+        <h2 class="section-title">Hubungi Kami</h2>
+        <p class="section-content">
+            Jika Anda memiliki pertanyaan, masukan, atau ingin bekerja sama dengan kami, jangan ragu untuk menghubungi tim WealthSync.
+        </p>
+        <div class="contact-info">
+            📧 Email   : <a href="mailto:fadhea.23150@mhs.unesa.ac.id">fadhea.23150@mhs.unesa.ac.id</a><br>
+            📞 Telepon : +62 812 3456 7890<br>
+            📍 Alamat  : Jalan Ketintang, Ketintang, Kecamatan Gayungan, Surabaya, Jawa Timur 60231. 
+        </div>
+    </section>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDx27o0bbjyzvXi2JmrabmMj4FMEQmatno",
+            authDomain: "wealthsync-d8cda.firebaseapp.com",
+            projectId: "wealthsync-d8cda",
+            storageBucket: "wealthsync-d8cda.firebasestorage.app",
+            messagingSenderId: "431567262192",
+            appId: "1:431567262192:web:93174cc8360cc974000d35",
+            measurementId: "G-0HYTM7BGB1"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+    </script>
+</body>
+</html>
