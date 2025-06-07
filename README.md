@@ -13,14 +13,31 @@ Tujuan dari pengembangan aplikasi WealthSync adalah untuk:
 - Membantu pengguna merencanakan keuangan pribadi dengan lebih baik melalui fitur analisis dan visualisasi data.
 - Menyediakan fitur setoran wajib bulanan dan riwayat transaksi lengkap untuk disiplin keuangan.
 
-Fitur Utama
-1. Autentikasi Aman
-Login dan registrasi pengguna menggunakan Firebase Authentication.
-2. Manajemen Transaksi
-Tambah, edit, hapus, dan filter transaksi berdasarkan kategori dan tanggal.
-3. Dashboard Interaktif
-Grafik transaksi 7 hari terakhir dan ringkasan pemasukan/pengeluaran.
-4. Riwayat Transaksi
-Riwayat lengkap transaksi dengan fitur ekspor ke PDF dan Excel.
+## 🧩 Fitur Utama & Endpoints API
 
+### 🔐 Autentikasi
+- `POST /login` – Login menggunakan email dan password (Firebase Auth).
+- `POST /register` – Registrasi pengguna baru.
+- `POST /logout` – Logout pengguna.
+
+### 👤 Manajemen Pengguna
+- `GET /profile` – Menampilkan profil pengguna.
+- `PUT /profile/update` – Memperbarui profil pengguna.
+
+### 💸 Transaksi
+- `GET /transactions` – Menampilkan daftar transaksi.
+- `POST /transactions` – Menambah transaksi baru.
+- `PUT /transactions/:id` – Mengedit transaksi.
+- `DELETE /transactions/:id` – Menghapus transaksi.
+- `GET /transactions/filter?date=&category=` – Filter transaksi berdasarkan tanggal & kategori.
+- `GET /transactions/export/pdf` – Ekspor transaksi ke PDF.
+- `GET /transactions/export/excel` – Ekspor transaksi ke Excel.
+
+### 📊 Dashboard & Analisis
+- `GET /dashboard/summary` – Ringkasan saldo, pemasukan, dan pengeluaran.
+- `GET /dashboard/chart` – Grafik transaksi 7 hari terakhir.
+- `GET /dashboard/recent` – Daftar transaksi terbaru.
+
+## 🌐 Alamat Website
+👉 https://wealthsync-d8cda.web.app/
 
