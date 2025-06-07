@@ -7,7 +7,7 @@ Kelompok 2
 # WealthSync
 WealthSync adalah aplikasi manajemen keuangan pribadi yang membantu pengguna mengelola transaksi, memantau pengeluaran, dan merencanakan keuangan mereka dengan mudah. Dengan tampilan yang intuitif dan fitur lengkap, WealthSync dirancang untuk pengguna yang ingin menjaga keuangan mereka tetap sehat dan terorganisir.
 
-#Tujuan
+# Tujuan
 Tujuan dari pengembangan aplikasi WealthSync adalah untuk memudahkan pencatatan pemasukan dan pengeluaran, menyediakan laporan keuangan yang mudah dianalisis, serta meningkatkan kesadaran akan pentingnya pengelolaan keuangan pribadi. Aplikasi ini juga diharapkan menjadi solusi digital yang praktis, aman, dan dapat diakses oleh berbagai kalangan.
 
 ## 🧩 Fitur Utama & Endpoints API
